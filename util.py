@@ -80,7 +80,7 @@ def animate(images, fig_title=''):
 def load_events(path_to_events, n_events=None):
     print('Loading events...')
     header = pd.read_csv(path_to_events, delim_whitespace=True, names=['width', 'height'],
-                         dtype={'width': int, 'height': int}, nrows=1)
+                         dtype={'width': np.int64, 'height': np.int64}, nrows=1)
     width, height = header.values[0]
     print(f'width, height: {width}, {height}')
     
@@ -116,7 +116,7 @@ def plot_3d(event_data, n_events=-1):
 
 def event_slice(event_data, start=0, duration_ms=30):
     events, height, width = event_data.event_list, event_data.height, event_data.width
-    mask = np.zeros((height, width), dtype=int)  
+    mask = np.zeros((height, width), dtype=np.int64)  
     start_idx = int(start * (len(events) - 1))
     end_time = events[start_idx].t + duration_ms / 1000.0
     
