@@ -80,17 +80,20 @@ def animate(images, fig_title=''):
 def load_events(path_to_events, n_events=None):
     print('Loading events...')
     header = pd.read_csv(path_to_events, delim_whitespace=True, names=['width', 'height'],
-                         dtype={'width': np.int, 'height': np.int}, nrows=1)
+                         dtype={'width': int, 'height': int}, nrows=1)
     width, height = header.values[0]
     print(f'width, height: {width}, {height}')
+    
     event_pd = pd.read_csv(path_to_events, delim_whitespace=True, header=None,
-                              names=['t', 'x', 'y', 'p'],
-                              dtype={'t': np.float64, 'x': np.int16, 'y': np.int16, 'p': np.int8},
-                              engine='c', skiprows=1, nrows=n_events, memory_map=True)
+                           names=['t', 'x', 'y', 'p'],
+                           dtype={'t': np.float64, 'x': int, 'y': int, 'p': int},
+                           engine='c', skiprows=1, nrows=n_events, memory_map=True)
+    
     event_list = []
     for event in event_pd.values:
         t, x, y, p = event
         event_list.append(Event(t, int(x), int(y), -1 if p < 0.5 else 1))
+    
     print('Loaded {:.2f}M events'.format(len(event_list) / 1e6))
     return EventData(event_list, width, height)
 
@@ -113,15 +116,19 @@ def plot_3d(event_data, n_events=-1):
 
 def event_slice(event_data, start=0, duration_ms=30):
     events, height, width = event_data.event_list, event_data.height, event_data.width
-    mask = np.zeros((height, width), dtype=np.int8)
+    mask = np.zeros((height, width), dtype=int)  
     start_idx = int(start * (len(events) - 1))
     end_time = events[start_idx].t + duration_ms / 1000.0
+    
     for e in events[start_idx:]:
         mask[e.y, e.x] = e.p
         if e.t >= end_time:
             break
+    
     img_rgb = np.ones((height, width, 3), dtype=np.uint8) * 255
     img_rgb[mask == -1] = (255, 0, 0)
     img_rgb[mask == 1] = (0, 0, 255)
+    
     fig = plt.figure(figsize=(7.2, 5.4))
     plt.imshow(img_rgb)
+    plt.show() 
