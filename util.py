@@ -86,7 +86,7 @@ def load_events(path_to_events, n_events=None):
     
     event_pd = pd.read_csv(path_to_events, delim_whitespace=True, header=None,
                            names=['t', 'x', 'y', 'p'],
-                           dtype={'t': np.float64, 'x': int, 'y': int, 'p': int},
+                           dtype={'t': np.float64, 'x': np.int64, 'y': np.int64, 'p': np.int64},
                            engine='c', skiprows=1, nrows=n_events, memory_map=True)
     
     event_list = []
